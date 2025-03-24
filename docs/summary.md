@@ -1,6 +1,16 @@
 * [Home](/)
-* [Get Started](/get-started/)
-* [App SDK](/app-sdk/)
+* Getting Started
+    * [Quick Start](/get-started/)
+    * [Server Configuration](/get-started/server-config)
+    * [Analytics Overview](/get-started/analytics-overview)
 
-    <!-- * [IAAS](get-started#use-ours "Use Our Server")
-    * [Deploy](get-started#deploy-your-own "Deploy Your Own Rowt Server") -->
+* App SDK
+    * [App SDK](/app-sdk/)
+    * [Creating Links](/app-sdk/creating-links)
+    * [Routing on App open](/app-sdk/intent-routing)
+
+* Console SDK
+
+
+* Server Customization
+    * [Security](/security)

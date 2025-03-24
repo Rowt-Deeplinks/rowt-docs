@@ -2,11 +2,12 @@
 
 # Rowt 
 
-> Easy Deep Linking and Analytics for React Native
+> Easy deep linking and analytics
 
-- Quick
-- Customizable
-- Secure
+- Share links to content in your mobile apps :link:
+- Track share analytics :chart_with_upwards_trend:
 
 [GitHub](https://github.com/docsifyjs/docsify/)
 [Get Started](/get-started/)
+
+![color](#fff)
