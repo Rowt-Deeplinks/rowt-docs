@@ -5,7 +5,7 @@
     * [Analytics Overview](/get-started/analytics-overview)
 
 * App SDK
-    * [App SDK](/app-sdk/)
+    * [Overview](/app-sdk/)
     * [Creating Links](/app-sdk/creating-links)
     * [Routing on App open](/app-sdk/intent-routing)
 

@@ -1,4 +1,4 @@
-## Rowt App SDK
+### Rowt App SDK
 
 This SDK lets your javascript app connect to any Rowt server for link generation.
 
