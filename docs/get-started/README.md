@@ -26,12 +26,12 @@ npm install rowt-console-sdk
 ```typescript
 const sdk = new RowtConsole('https://your.server.url')
 
-sdk.login('myserverusername', 'myserverpassword')
+const user = await sdk.login('myserverusername', 'myserverpassword')
 
 // Then you're free to use any method
 // For example - Get all links and interactions for your project
 
-sdk.getProjectById
+const project = sdk.getProjectById('your-project-uuid')
 
 ```
 

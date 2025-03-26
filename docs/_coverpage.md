@@ -1,11 +1,11 @@
-![logo](_media/rowtfavicon.svg ':size=120x120')
+![logo](_media/rowtLogo.svg ':size=120x120')
 
-# Rowt 
+# Hi, we're Rowt
 
-> Easy deep linking and analytics
+> We make mobile linking simple
 
-- Share links to content in your mobile apps :link:
-- Track share analytics :chart_with_upwards_trend:
+- Built in analytics
+- Self hosted and developer friendly
 
 [GitHub](https://github.com/docsifyjs/docsify/)
 [Get Started](/get-started/)
