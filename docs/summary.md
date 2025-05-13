@@ -10,14 +10,14 @@
 
 * App SDK
     * [Overview](/app-sdk/)
-    * [Creating Links](/app-sdk/creating-links)
-    * [Routing on App open](/app-sdk/intent-routing)
+    * [Custom Metadata](/app-sdk/custom-metadata)
+    <!-- * [Routing on App open](/app-sdk/intent-routing) -->
 
 * Server Customization
     * [Security](/security)
 
 * Console SDK
-    * [Overview](/console-sdk)
+    * [Overview](/console-sdk/)
     * [Authentication](/console-sdk/auth)
     * [Querying](/console-sdk/querying)
     
