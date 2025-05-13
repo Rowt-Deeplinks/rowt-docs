@@ -7,7 +7,7 @@
 - Built in analytics
 - Self hosted and developer friendly
 
-[GitHub](https://github.com/docsifyjs/docsify/)
+[GitHub](https://github.com/rowt-deeplinks/)
 [Get Started](/get-started/)
 
 ![color](#fff)
