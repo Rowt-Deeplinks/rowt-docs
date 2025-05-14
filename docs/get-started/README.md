@@ -1,20 +1,34 @@
-# Getting Started
 
-## Use Our Servers
 
-If you're looking to get started fast, you can use the Rowt service and connect your app with the SDK. [Learn more about our service here.](https://console.rowt.app)
 
-## Deploy your own Rowt Server
+## Use Rowt
 
-For more control over behavior and costs, you can spin up a Rowt Server on your own infrastructure. We're an open source project, and this serves as a free or low cost way for us to make deep linking simpler.
+If you want to get started fast, you can use Rowt's API service and connect your app with the SDK. 
 
-[Complete Server Docs](/server)
+In your React Native or Expo app:
+```bash
+npm install rowt-sdk
+```
+
+
+[Full SDK Docs](/app-sdk/)
+
+[Create an account](https://console.rowt.app)
+
+[Pricing](https://console.rowt.app/pricing)
 
 <br>
 <br>
 <br>
 
-# Console SDK
+## Self-Host
+### Alternatively, you can self-host on your own infrastructure for more control over your API's behavior and costs.
+We're an open source project, and this serves as a free or low cost way for us to make deep linking simpler :)
+
+[Complete Self-Hosting Docs](/server)
+
+
+<!-- # Console SDK
 
 When deploying your own Rowt Server, the same API we use on the [Rowt Console](https://console.rowt.app) is accessible for anyone to use through our Console SDK. 
 
@@ -35,6 +49,6 @@ const project = sdk.getProjectById('your-project-uuid')
 
 ```
 
-[Complete Console SDK Docs](/console-sdk)
+[Complete Console SDK Docs](/console-sdk) -->
 
 
