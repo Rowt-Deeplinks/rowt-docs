@@ -3,7 +3,6 @@
 </p>
 
 * Getting Started
-    * [About](/what-is-rowt/)
     * [Quickstart](/get-started/)
     * [App SDK](/app-sdk/)
 
