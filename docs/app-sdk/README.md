@@ -1,8 +1,11 @@
+⚠️ Native linking support is currently limited to Expo. Native iOS/Android support is in progress.
+
+
 # Rowt SDK Integration Guide
 
-<!-- ## Overview -->
+## Overview
 
-The Rowt SDK provides deep linking capabilities for React Native applications, supporting both Expo and pure React Native implementations. This guide will walk you through integrating the SDK into your project.
+The Rowt SDK provides deep linking capabilities and smooth integration with the [create-rowt-server](https://npmjs.com/create-rowt-server) API for React Native applications, supporting both Expo and pure React Native implementations. This guide will walk you through integrating the SDK into your project.
 
 ## Installation
 
@@ -19,7 +22,6 @@ import { Rowt } from 'rowt-sdk';
 
 // Initialize with your configuration
 Rowt.initialize({
-  apiKey: 'your-api-key',
   debug: true // Enable debug logging
 });
 ```
@@ -96,14 +98,26 @@ Update your `app.json` or `app.config.js`:
 }
 ```
 
-### 3. Create Deep Links (Expo Only)
+### 3. Create Deep Links
 
 ```typescript
 // This method is only available in Expo
-const deepLink = Rowt.createDeepLink('/products/123', {
-  promo: 'summer'
-});
-console.log(deepLink); // myapp://products/123?promo=summer
+const deepLink = new RowtLink(
+        {
+          serverUrl: 'https://rowt.app', // or your custom rowt instance url
+          apiKey: 'your-secret-api-key',
+          projectId: 'project-uuid',
+        },
+        {
+          url: `/products/${item.id}`,
+          title: product.name,
+          description: product.description,
+          imageUrl: product.imageUrl,
+        })
+console.log(deepLink); 
+// generates shortlink
+// ex: https://rowt.app/d8kj8eo8s03 
+// opens myapp://products/123
 ```
 
 ### 4. Complete Expo Example
@@ -374,7 +388,7 @@ const linkOptions = {
   description: 'Amazing product on sale',
   imageUrl: 'https://example.com/product.jpg',
   expiration: new Date('2025-12-31'),
-  properties: {
+  metadata: {
     campaign: 'summer-sale'
   }
 };
@@ -387,15 +401,7 @@ console.log('Short link:', shortLink);
 console.log('Shortcode:', rowtLink.getShortcode());
 ```
 
-When sent on social media (or chat apps that generate previews, etc), it should look something like this:
 
-
-<hr>
-<img src="_media/rowtPreviewImage.svg" alt="Example Site" title="Example Site" width="20%">
-
-**Example Site**  
-This link and metadata were generated with Rowt
-<hr>
 
 > [IMPORTANT]
 > This is especially important for generating deep links.  
