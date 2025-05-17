@@ -1,154 +1,416 @@
-# create-rowt-server
+# Self-Hosting a Rowt Instance
 
-The goal of this project was to create a simple, drop-in, open source package for running deeplinking.
+Use the `create-rowt-server` scaffold to get your own instance up and running on your own infrastructure.
 
-Use the `create-rowt-server` package to scaffold a versatile API for deeplinking and analytics.
+## Installation
 
-Hosting on your own infrastructure gives you more control over costs and the behavior of your API.
+You can create a new Rowt server with a single command:
 
-## Setup
-
-```
+```bash
 npx create-rowt-server my-app
 ```
 
-Or specify the project name when prompted:
+Alternatively, run without specifying the project name and you'll be prompted:
 
-```
+```bash
 npx create-rowt-server
 ```
 
-1. **Create your server:**
+## Quick Start
 
-```
-npx create-rowt-server my-rowt-server
-```
-
-2. **Navigate to your project:**
-
-```
-cd my-rowt-server
-```
-
-3. **Install dependencies:**
-
-```
-npm install
-```
-
-## Configure your database
-   * Set up PostgreSQL with the required `generate_uid()` function:
-   
-   ```sql
-   CREATE OR REPLACE FUNCTION generate_uid(size INT) RETURNS TEXT AS $$
-   DECLARE
-     characters TEXT := 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-     bytes BYTEA := gen_random_bytes(size);
-     l INT := length(characters);
-     i INT := 0;
-     output TEXT := '';
-   BEGIN
-     WHILE i < size LOOP
-       output := output || substr(characters, get_byte(bytes, i) % l + 1, 1);
-       i := i + 1;
-     END LOOP;
-     RETURN output;
-   END;
-   $$ LANGUAGE plpgsql VOLATILE;
-   ```
-   
-   * Update the `DATABASE_URL` in `.env`
-
-## Configure environment variables
-   
-   Create a `.env` file in your `my-rowt-server` project root:
-   
-   ```env
-   # Database Configuration
-   DATABASE_URL=postgresql://username:password@host:port/database
-   
-   # JWT Secret (generate a secure random string)
-   JWT_SECRET=your-secure-jwt-secret-key
-   
-   # Server Port (optional, defaults to 3000)
-   PORT=3000
-   
-   # Tenant Mode
-   TENANT_MODE=single-tenant  # or multi-tenant
-   
-   # Single-Tenant Admin Credentials (only for single-tenant mode)
-   ADMIN_UUID=1
-   ADMIN_EMAIL=admin@example.com
-   ADMIN_PASSWORD=your-secure-admin-password
-   
-   # Stripe Configuration (only for multi-tenant mode)
-   STRIPE_SECRET_KEY=sk_test_your_stripe_key
+1. Create your Rowt server instance:
+   ```bash
+   npx create-rowt-server my-rowt-server
    ```
 
-6. **Start the server:**
+2. Choose your tenant mode (Single-tenant recommended for most users)
 
-```
-npm run build
-npm run start
-```
+3. Choose your database preference, PostgreSQL or SQLite (Postgres is recommended for most production cases)
 
-For development mode:
-```
-npm run start:dev
-```
+  - NOTE: Your credentials, such as your `ROWT_JWT_SECRET` and `ROWT_ADMIN_PASSWORD` will be generated and shown in the terminal on setup completion, store these securely.
+
+4. Navigate to your project:
+   ```bash
+   cd my-rowt-server
+   ```
+
+5. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+5. Configure your database
+
+`Postgres:` Replace the `ROWT_DATABASE_URL` with your postgres database url.
+
+`SQLite`: A default SQLite database is create at project root, `ROWT_DATABASE_URL` will default to this root path, adjust as needed. 
+
+- When deploying to production, you may want to store your SQLite file in a Docker volume or similar for persistence and backups.
+
+6. Build and start the server:
+   ```bash
+   npm run build
+   npm run start
+   ```
+
+7. Your Rowt server is now running at `http://localhost:3000`
+
+## Server Commands
+
+- **Build the server**: `npm run build`
+- **Start the server**: `npm run start`
+- **Start in development mode**: `npm run start:dev`
+- **Start without SSL**: `npm run start:nossl`
+- **Format code**: `npm run format`
+- **Lint code**: `npm run lint`
 
 ## Tenant Modes
-* **Single-tenant (Recommended)**: Best for individual apps or companies
-  * All projects belong to one admin user
-  * Requires `ADMIN_UUID`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` in `.env`
-  * No Stripe integration needed
-  
-* **Multi-tenant**: Best for situations where you have many apps with different managers
-  * Supports multiple user accounts
-  * Each user can have multiple projects
-  * Requires Stripe configuration for billing tiers
-  * Set `STRIPE_SECRET_KEY` in `.env`
 
-**First Steps After Setup**
+Rowt instances can be ran in two tenant modes:
 
-**Single-Tenant Mode:**
-Login with your admin credentials:
-```bash
-curl -X POST http://localhost:3000/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "admin@example.com",
-    "password": "your-secure-admin-password"
-  }'
+### Single-tenant Mode (Recommended)
+
+Single-tenant mode is ideal for individual apps or companies where only one organization manages all apps/projects. In this mode:
+
+- A single admin account manages all projects
+- No user management required
+- Unlimited links and analytics - only limited by your own infrastructure
+- Simplified setup
+
+This is the recommended mode for most users.
+
+### Multi-tenant Mode
+
+Multi-tenant mode is designed for situations where you need to support multiple organizations or users with their own separate projects. In this mode:
+
+- Multiple user accounts managing separate projects
+- User registration and authentication
+- Optional Stripe integration for subscription management or to use for example usage gating
+- Tier-based limits on links and analytics (with Stripe integration enabled)
+
+Multi-tenant mode is more suitable for agencies serving multiple clients, organizations with many teams managing many apps, and SaaS.
+
+## Database Configuration
+
+Rowt supports both PostgreSQL and SQLite databases.
+
+### PostgreSQL (Recommended for Production)
+
+PostgreSQL is recommended for production deployments due to better performance and scalability. To configure PostgreSQL:
+
+1. Set up a PostgreSQL database (any version 11+)
+2. Update your `.env` file with the connection details:
+
+```
+ROWT_DATABASE_URL=postgresql://username:password@hostname:5432/dbname
+ROWT_DB_TYPE=postgres
+ROWT_DB_SSL=true  # Set to false if your database doesn't use SSL
 ```
 
-**Multi-Tenant Mode:**
-Create a new user account:
-```bash
-curl -X POST http://localhost:3000/users/create \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "secure-password",
-    "role": "user"
-  }'
+Recommendations:
+- For cloud deployments: [Neon](https://neon.tech), [Supabase](https://supabase.com), or [RDS](https://aws.amazon.com/rds/)
+- For local development: [PostgreSQL](https://www.postgresql.org/download/) or [Postgres.app](https://postgresapp.com/)
+
+### SQLite (Simpler Setup)
+
+SQLite is easier to set up and requires no external database service. We use the sqlite3 package, which supports SQLite v3.31.0+. It's great for development or small-scale deployments:
+
+1. Update your `.env` file:
+
+```
+ROWT_DATABASE_URL=sqlite:database.sqlite
+ROWT_DB_TYPE=sqlite
 ```
 
-### Verify Installation
-* Visit `http://localhost:3000` - Should display the Rowt welcome page
-* Test auth endpoint: `http://localhost:3000/auth` - Returns "Hello World!"
+Notes:
+- SQLite stores data in a file on your server
+- No additional setup required
+- Limited scalability compared to PostgreSQL
 
-## Self-Hosting Your Dashboard
-To manage your Rowt instance with a web interface:
-* **Console SDK**: Use the [Rowt Console SDK](https://github.com/rowt-app/console-sdk) to build custom dashboards
-* **Example Console**: Deploy the [Rowt Example Console](https://github.com/rowt-app/example-console) for a ready-to-use dashboard
+## Environment Configuration
 
-## Production Deployment
-* Use HTTPS with a reverse proxy (nginx, Caddy)
-* Secure your database credentials
-* Keep your JWT secret safe
-* Never commit `.env` files to version control
+The `.env` file contains all necessary configuration. Here's a sample:
 
-**Documentation**
-For complete setup instructions, API documentation, and guides, visit:
-📚 **https://docs.rowt.app**
+```
+# Rowt Server Configuration
+ROWT_TENANT_MODE=single-tenant
+
+# Database Configuration
+ROWT_DATABASE_URL=postgresql://username:password@localhost:5432/rowt
+ROWT_DB_TYPE=postgres
+ROWT_DB_SSL=true
+
+# Server Configuration
+ROWT_JWT_SECRET=your-secure-secret-here
+PORT=3000
+
+# Single Tenant Admin (only for single-tenant mode)
+ROWT_ADMIN_EMAIL=admin@example.com
+ROWT_ADMIN_PASSWORD=your-secure-password
+ROWT_ADMIN_UUID=1
+
+# Multi Tenant with Subscriptions (only for multi-tenant mode and Stripe integration)
+# STRIPE_SECRET_KEY=sk_test_...
+# STRIPE_WEBHOOK_SECRET=whsec_...
+```
+
+## Configuration with rowtconfig.js
+
+Rowt Server behavior can be customized through the `src/rowtconfig.ts` file. Here are the key configurations:
+
+```javascript
+const RowtConfig = {
+  // Tenant mode
+  tenant_mode: process.env.ROWT_TENANT_MODE || 'single-tenant',
+
+  // Cleanup
+  cleanup_cron_expression: '0 2 * * *', // Run at 2 AM every day
+  link_expiration_days: 400, // Links older than this will be deleted
+  link_extension_days: 32, // Links with interactions within this period will not be deleted
+  interaction_expiration_days: 90, // Interactions older than this will be deleted
+
+  // Interaction behavior
+  will_track_interactions: true,
+  absolute_fallback_url: 'https://notfound.rowt.app',
+
+  // Abuse prevention
+  rate_limit_defaults: [
+    {
+      limit: 30,
+      ttl: 60000,
+    },
+  ], // 30 requests per minute
+  max_jsonb_size: 10240, // 10kb
+
+  // Auth
+  refreshTokenExpires: '7d',
+  accessTokenExpires: '1h',
+  passwordRequirements: {
+    minLength: 8,
+    maxLength: 50,
+    requireCapital: true,
+    requireLowercase: true,
+    requireNumber: true,
+    requireSpecialCharacter: true,
+  },
+
+  // Payment and subscription (Multi-tenant only)
+  stripe_integration: false,
+  tierLimits: {
+    links: [50, 2000, 5000, -1], // -1 for unlimited
+    interactions: [500, 50000, 175000, -1], // -1 for unlimited
+  },
+};
+```
+
+### Configuration Options
+
+| Option | Description |
+|--------|-------------|
+| `tenant_mode` | Mode of operation: 'single-tenant' or 'multi-tenant' |
+| `cleanup_cron_expression` | Cron expression for automatic data cleanup |
+| `link_expiration_days` | Number of days before links are considered expired |
+| `link_extension_days` | Recent interactions within this many days prevent link deletion |
+| `interaction_expiration_days` | Number of days before interactions are deleted |
+| `will_track_interactions` | Enable/disable interaction tracking |
+| `absolute_fallback_url` | URL to use when all fallbacks fail |
+| `rate_limit_defaults` | Default rate limiting settings |
+| `max_jsonb_size` | Maximum size for JSON data in properties/metadata (bytes) |
+| `refreshTokenExpires` | JWT refresh token expiration |
+| `accessTokenExpires` | JWT access token expiration |
+| `passwordRequirements` | Password validation rules |
+| `stripe_integration` | Enable/disable Stripe integration (multi-tenant only) |
+| `tierLimits` | Link and interaction limits per tier (multi-tenant only) |
+
+## Deploying to Production
+
+### General Considerations
+
+1. **Environment Variables**:
+   - Use a secure `ROWT_JWT_SECRET` (at least 32 characters)
+   - Set secure admin credentials
+
+2. **Database**:
+   - Use PostgreSQL for production deployments
+   - Ensure regular backups
+
+3. **Security**:
+   - Use HTTPS in production
+   - Set up a reverse proxy (Nginx, Apache)
+   - Configure appropriate firewalls
+
+## Endpoints and API Reference
+
+
+
+
+
+### Deploying with Docker
+
+Create a `Dockerfile` in your Rowt server project:
+
+```dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+EXPOSE 3000
+CMD ["npm", "run", "start"]
+```
+
+Create a `docker-compose.yml` for easier deployment:
+
+```yaml
+version: '3'
+services:
+  rowt-server:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - ROWT_DATABASE_URL=postgresql://username:password@db:5432/rowt
+      - ROWT_DB_TYPE=postgres
+      - ROWT_DB_SSL=false
+      - ROWT_JWT_SECRET=your-secure-secret-here
+      - ROWT_TENANT_MODE=single-tenant
+      - ROWT_ADMIN_EMAIL=admin@example.com
+      - ROWT_ADMIN_PASSWORD=your-secure-password
+      - ROWT_ADMIN_UUID=1
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=rowt
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  pg_data:
+```
+
+### SQLite Production Setup
+
+If you're using SQLite in production, ensure data persistence:
+
+1. Store the SQLite file in a dedicated volume:
+
+```yaml
+volumes:
+  - ./data:/app/data
+```
+
+2. Update your `.env` file:
+
+```
+ROWT_DATABASE_URL=sqlite:/app/data/database.sqlite
+ROWT_DB_TYPE=sqlite
+```
+
+3. Set up regular backups:
+
+```bash
+# Example backup script
+#!/bin/bash
+DATE=$(date +%Y-%m-%d_%H-%M-%S)
+cp /path/to/data/database.sqlite /path/to/backups/database_$DATE.sqlite
+```
+
+### Deploying to Cloud Platforms
+
+#### Heroku
+
+1. Create a `Procfile`:
+
+```
+web: npm run start
+```
+
+2. Configure environment variables in Heroku dashboard
+3. Add a PostgreSQL add-on
+
+#### Render
+
+1. Select "Web Service" from the dashboard
+2. Connect your repository
+3. Configure build settings:
+   - Build command: `npm install && npm run build`
+   - Start command: `npm run start`
+4. Add environment variables in the dashboard
+
+#### Railway
+
+1. Import your GitHub repository
+2. Add a PostgreSQL plugin
+3. Configure environment variables
+4. Deploy
+
+## Integrating with Your Apps
+
+### Client SDKs
+
+Rowt provides SDKs for easy integration with your applications:
+
+- [rowt-sdk](https://npmjs.com/rowt-sdk) - For client applications
+[Jump to rowt-sdk Documentation](/app-sdk/?id=overview)
+- [rowt-console-sdk](https://npmjs.com/rowt-console-sdk) - For admin consoles
+[Jump to rowt-console-sdk Documentation](/console-sdk/?id=overview)
+
+## Troubleshooting
+
+### Common Issues
+
+#### Database Connection Problems
+
+- Ensure your database credentials are correct
+- Check if the database server is accessible
+- For PostgreSQL, verify SSL settings
+
+#### Link Creation Errors
+
+- Verify your project ID and API key
+- Check URL format
+- Ensure metadata doesn't exceed size limits
+
+#### Redirections Not Working
+
+- Verify app schemes are correctly configured
+- Check fallback URLs
+- Ensure device detection is working properly
+
+### Logs
+
+Check server logs for detailed error information:
+
+```bash
+# View last 100 lines of logs
+tail -n 100 logs/rowt-server.log
+
+# Follow logs in real-time
+tail -f logs/rowt-server.log
+```
+
+## Contributing
+
+Rowt is open-source and contributions are welcome!
+
+1. Fork the repository
+2. Create your feature branch: `git checkout -b my-feature`
+3. Commit your changes: `git commit -am 'Add my feature'`
+4. Push to the branch: `git push origin my-feature`
+5. Submit a pull request
+
+## License
+
+Rowt Server is released under the MIT License. See the LICENSE file for details.

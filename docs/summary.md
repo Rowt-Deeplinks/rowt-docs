@@ -7,5 +7,6 @@
     * [App SDK](/app-sdk/)
 
 * Self Hosting
-    * [Self Host API](/self-host/)
+    * [Self Host an Instance](/self-host/)
+    * [API Endpoints](/self-host/api-endpoints)
     * [Console SDK](/console-sdk/)

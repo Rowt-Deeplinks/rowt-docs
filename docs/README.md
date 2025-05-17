@@ -3,7 +3,7 @@ Deep links are links created to open native apps from web URLs — an issue that
 
 #### Building deep links yourself typically requires:
 - **A hosted API** *– to handle link creation, redirection, and tracking*
-- **A database** *– to store link metadata, analytics, expiration rules*
+- **A database** *– to store link metadata and analytics*
 - **Unique ID generation** *- to give each deeplink a unique web link*
 - **Native-level intent handling** *– to your app when a link is tapped*
 - **Routing logic** *– to navigate to the right content when a link was used to open the app*
@@ -18,15 +18,15 @@ It’s an absurd amount of moving parts for something as simple as sharing a lin
 #### Rowt simplifies everything into a few focused components.
 If you’re using our managed service, all you need is the App SDK — everything else is handled for you.
 If you’re self-hosting to save costs or customize behavior, you get a modular, production-ready stack with:
-- A clean, intuitive API
+- A simple, intuitive API
 - Preconfigured database schema
-- A prebuilt unique id generator for postgres
-- Auto-generated metadata previews
+- Choice of Postges or SQLite
+- Generation of social metadata previews
 - Built-in analytics and security
 - Fallback links for your app store listings and website
 - Easy-to-configure native integrations
 
-Seriously, the hardest part about this is copy-pasting some native code into your ios and android builds. And you don't even have to think about that if you're using Expo.
+Seriously, the hardest part about this is copy-pasting some native code snippets into your ios and android builds. And you don't even have to think about that if you're using Expo.
 
 Whether you use our managed service or host it yourself, Rowt gives you the tools to integrate reliable deep links in minutes — not weeks.
 

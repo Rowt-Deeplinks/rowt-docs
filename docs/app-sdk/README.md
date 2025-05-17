@@ -1,4 +1,3 @@
-⚠️ Native linking support is currently limited to Expo. Native iOS/Android support is in progress.
 
 
 # Rowt SDK Integration Guide
@@ -6,6 +5,8 @@
 ## Overview
 
 The Rowt SDK provides deep linking capabilities and smooth integration with [Rowt](https://console.rowt.app) services, as well as any self-hosted [create-rowt-server](https://npmjs.com/create-rowt-server) API for React Native applications, supporting both Expo and pure React Native implementations. This guide will walk you through integrating the SDK into your project.
+
+⚠️ Native linking support is currently limited to Expo. Native iOS/Android support is in progress.
 
 ## Installation
 

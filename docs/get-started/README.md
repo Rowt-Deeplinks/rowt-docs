@@ -5,17 +5,27 @@
 
 If you want to get started fast, you can use Rowt's API service and connect your app with the SDK. 
 
-In your React Native or Expo app:
+1. [Create an account](https://console.rowt.app)
+
+2. Create your first project
+
+3. Copy your Project ID and API Key from the project configuration page
+
+4. In your React Native or Expo app:
 ```bash
 npm install rowt-sdk
 ```
+[Full SDK Docs](/app-sdk/) - 
+[view on npm](https://npmjs.com/rowt-sdk)
+
+5. For mobile apps, follow the SDK Integration guide for your framework
+- [Expo](/app-sdk/?id=expo-integration-guide)
+- [React Native](/app-sdk/?id=react-native-cli-integration-guide)
+
+6. Start creating links to your app's content
 
 
-[Full SDK Docs](/app-sdk/)
-
-[Create an account](https://console.rowt.app)
-
-[Pricing](https://console.rowt.app/pricing)
+[Rowt's Pricing](https://console.rowt.app/pricing)
 
 <br>
 <br>
@@ -25,7 +35,9 @@ npm install rowt-sdk
 ### Alternatively, you can self-host on your own infrastructure for more control over your API's behavior and costs.
 We're an open source project, and this serves as a free or low cost way for us to make deep linking simpler :)
 
-[Complete Self-Hosting Docs](/server)
+[Self-Hosting a Rowt instance](/self-host/)
+
+Self-hosting gives you the option to run your instance in single-tenant mode, quickly deploy with SQLite, or use your own Postgres database (Postgres recommended for most production uses)
 
 
 <!-- # Console SDK
