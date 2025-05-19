@@ -370,6 +370,24 @@ export default function App() {
 }
 ```
 
+
+## Mobile Configuration
+
+#### Configure URI Scheme
+In your projects configuration, you'll need to set up your uri scheme for each app version with `androidUriScheme` and/or `iosUriScheme`. Rowt will then use this as the prefix for your stored path. 
+
+Ex: Create a link with '/products/3' and let's say you've configured your app's uri scheme to be 'myapp://'.
+
+This will try to open 'myapp://products/3' which triggers your app to open if installed and configured correctly.
+
+<br>
+
+#### Configure App Store Fallbacks
+
+When your users click on a deeplink and you don't have an app on your phone that matches your uri scheme, it will try to use your app's `appStoreId` or `playStoreId` to send your user to download the app. 
+
+If you leave the store id blank, it will skip the store redirect and fall back to your projects website (`fallbackUrl`) instead.
+
 ## Creating Dynamic Links
 
 The SDK also provides functionality to create shortened links:
