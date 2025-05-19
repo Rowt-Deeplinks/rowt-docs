@@ -388,6 +388,32 @@ When your users click on a deeplink and you don't have an app on your phone that
 
 If you leave the store id blank, it will skip the store redirect and fall back to your projects website (`fallbackUrl`) instead.
 
+## Fallback URLs
+
+When setting up your app, there are 4 tiers of fallback links.
+
+First, if your link is a deeplink, it tries to open the app on your device.
+
+If that fails, and you have an app/play store id configured, it tries to open your listing in the appropriate store.
+
+If you have no store id configured, it will open your app's fallback url.
+
+If the app's fallback url is not set up, it will fall back to the absolute_fallback_url in your server's rowtConfig.ts
+
+For those using our managed service, the absolute fallback is https://rowt.app/error
+
+
+## API Keys
+
+Each project you create has an API key generated on creation. This is available in the `RowtProject` object via `RowtProject.apiKey`.
+
+To generate a new API key, Rowt users can find the 'Regenerate Api Key' button in their project configuration.
+
+Self-hosted users can regenerate through the endpoint /projects/generateApiKey or via the RowtConsole with `RowtConsole.regenerateApiKey`
+
+**Keep in mind: Generating a new API key will invalidate the existing key, any app using the old key will fail to validate.**
+
+
 ## Creating Dynamic Links
 
 The SDK also provides functionality to create shortened links:
@@ -613,7 +639,7 @@ The backend enforces this structure using TypeORM:
 additionalMetadata?: Record<string, any>;
 ```
 
-## Best Practices
+## Metadata Best Practices
 
 1. **Keep it structured**: While the field is flexible, maintain consistent structure for similar link types
 2. **Use meaningful keys**: Choose descriptive key names that clearly indicate the data's purpose
