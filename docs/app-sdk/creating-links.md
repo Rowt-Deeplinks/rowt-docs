@@ -1,22 +1,28 @@
 # Creating Links
 
 ##### You can create links with the App SDK that redirect to a given deeplink or web link and track the interactions.
-    
+
 <br>
 
 # Basics
 > Let's generate a simple link that redirects to some web url.
 
 ```typescript
-import {RowtLink} from 'rowt-app-sdk'
+import {RowtLink} from 'rowt-sdk'
+
+const config = {
+    serverUrl: 'https://rowt.app', // or your self-hosted URL
+    apiKey: 'your-api-key',
+    projectId: 'your-project-id'
+}
 
 const linkOptions = {
     url: 'https://example.com'
 }
 
-const myLink: RowtLink = new RowtLink(myProjectId, myAPIKey, linkOptions)
+const myLink: RowtLink = new RowtLink(config, linkOptions)
 
-const shortlink: string = await myLink.generateShortlink()
+const shortlink: string = await myLink.createLink()
 
 console.log(shortlink)
 
