@@ -9,4 +9,5 @@
 * Self Hosting
     * [Self Host an Instance](/self-host/)
     * [API Endpoints](/self-host/api-endpoints)
+    * [Migrating to v1.0](/server/migrating-v1)
     * [Console SDK](/console-sdk/)
