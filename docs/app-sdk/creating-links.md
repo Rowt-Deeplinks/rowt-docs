@@ -65,4 +65,31 @@ This link and metadata were generated with Rowt
 
 In the case of web links, the original link's preview metadata will be used by default unless overwritten.
 
-# 
+<br>
+<br>
+
+# Custom Shortcodes
+
+> By default, Rowt generates a random 12-character shortcode for each link. You can optionally provide your own custom shortcode for memorable, branded links.
+
+```typescript
+...
+const linkOptions = {
+    url: 'https://example.com',
+    customShortcode: 'promo2024' // 1-12 characters, alphanumeric, hyphens, and underscores
+}
+...
+```
+
+This will create a link like `https://rowt.app/promo2024` instead of `https://rowt.app/oIRlPWSd9r6D`.
+
+**Requirements:**
+- Must be 1-12 characters long
+- Can only contain letters (a-z, A-Z), numbers (0-9), hyphens (-), and underscores (_)
+- Must be unique across your entire server
+- If the shortcode is already taken, the API will return a 400 error
+
+> [!TIP]
+> Custom shortcodes are great for marketing campaigns, QR codes, or any link you want to be easy to remember and type.
+
+#
