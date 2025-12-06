@@ -54,6 +54,62 @@ The SDK automatically:
 - Refreshes tokens when they expire (401 responses)
 - Queues failed requests during token refresh and retries them with the new token
 - Clears tokens on logout or refresh failure
+- Properly rejects failed requests if token refresh fails
+
+#### Proactive Token Validation
+
+The SDK provides methods to validate and refresh tokens proactively:
+
+```typescript
+// Validate if current tokens are still valid
+const isValid = await client.validateTokens();
+
+// Manually refresh tokens
+const refreshed = await client.manualRefreshToken();
+if (refreshed) {
+  console.log('Tokens refreshed successfully');
+} else {
+  console.log('Token refresh failed, user should re-authenticate');
+}
+```
+
+#### Handling Stale Sessions
+
+When implementing authentication in your app, handle stale sessions by validating tokens when the user returns:
+
+```typescript
+import { useEffect, useCallback } from 'react';
+
+const useTokenValidation = (client, user, signOut) => {
+  const validateSession = useCallback(async () => {
+    if (!user) return;
+
+    const isValid = await client.validateTokens();
+    if (!isValid) {
+      const refreshed = await client.manualRefreshToken();
+      if (!refreshed) {
+        // Tokens are expired and refresh failed - sign out
+        await signOut();
+      }
+    }
+  }, [client, user, signOut]);
+
+  useEffect(() => {
+    // Validate on mount
+    validateSession();
+
+    // Validate when window gains focus (user returns to app)
+    const handleFocus = () => {
+      validateSession();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [validateSession]);
+};
+```
+
+This pattern ensures users don't experience silent failures when returning to your app after tokens have expired.
 
 ## API Reference
 
@@ -124,6 +180,24 @@ Parameters:
 - `updatePasswordDTO`: Object containing `email` and new `password`
 
 Returns: Updated `RowtUser` object
+
+#### validateTokens
+Validates if the current access token is still valid.
+
+```typescript
+const isValid = await client.validateTokens(): Promise<boolean>;
+```
+
+Returns: `boolean` indicating if the current token is valid
+
+#### manualRefreshToken
+Manually triggers a token refresh using the stored refresh token.
+
+```typescript
+const success = await client.manualRefreshToken(): Promise<boolean>;
+```
+
+Returns: `boolean` indicating if the refresh was successful
 
 ### User Profile Methods
 
@@ -334,7 +408,7 @@ interface RowtGetProjectOptions {
 
 The SDK uses Axios for HTTP requests and will throw errors for failed requests. Common error scenarios:
 
-- **401 Unauthorized**: Automatically triggers token refresh
+- **401 Unauthorized**: Automatically triggers token refresh. If refresh fails, the error is propagated to the caller
 - **Network errors**: Thrown as Axios errors
 - **Invalid parameters**: Thrown as standard JavaScript errors
 
@@ -350,6 +424,37 @@ try {
     console.error('Login failed:', error.message);
   }
 }
+```
+
+### Handling Token Refresh Failures
+
+When a 401 error occurs, the SDK automatically attempts to refresh the token. If the refresh fails, all pending requests are rejected:
+
+```typescript
+try {
+  const projects = await client.getUserProjects();
+} catch (error) {
+  if (error.response?.status === 401) {
+    // Token refresh failed - user needs to re-authenticate
+    console.error('Session expired. Please log in again.');
+    await client.logout();
+    // Redirect to login page
+  }
+}
+```
+
+For React applications, implement a global error boundary or interceptor to handle token refresh failures:
+
+```typescript
+const handleApiError = async (error) => {
+  if (error.response?.status === 401) {
+    // Clear local state and redirect to login
+    setUser(null);
+    localStorage.removeItem('user');
+    router.push('/login');
+  }
+  throw error;
+};
 ```
 
 ## Examples
@@ -479,6 +584,8 @@ async function getProjectAnalytics(projectId: string) {
 3. **Date Ranges**: When fetching analytics, be mindful of date ranges to avoid fetching too much data
 4. **Logging Out**: Always call `logout()` when the user signs out to clear stored tokens
 5. **Project IDs**: Store frequently accessed project IDs to avoid repeated lookups
+6. **Token Validation**: Validate tokens on app mount and when window gains focus to prevent stale session errors
+7. **Session Management**: Implement proper session timeout handling by listening for 401 errors and signing users out when token refresh fails
 
 ## Browser Compatibility
 

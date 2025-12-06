@@ -327,17 +327,13 @@ Returns an array of project objects:
 {
   "id": "project-uuid",       // Required: Project UUID
   "options": {                // Optional: Query options
-    "includeLinks": true,     // Optional: Include links in response (default: false)
-    "includeInteractions": true,  // Optional: Include interactions in response (default: false)
-    "startDate": "2023-01-01",    // Optional: Start date for interactions filter
-    "endDate": "2023-12-31",      // Optional: End date for interactions filter
-    "getPreviousPeriod": true     // Optional: Include previous period stats (default: false)
+    "includeLinks": true      // Optional: Include links in response (default: false)
   }
 }
 ```
 
 **Success Response (200):**
-Returns the project object with optional links and interactions:
+Returns the project object with optional links:
 ```json
 {
   "id": "project-uuid",
@@ -361,21 +357,9 @@ Returns the project object with optional links and interactions:
       "additionalMetadata": { "og:type": "article" },
       "properties": { "source": "email" },
       "lifetimeClicks": 42,
-      "createdAt": "2023-06-01T12:00:00.000Z",
-      "interactions": [
-        {
-          "id": "interaction-uuid",
-          "referer": "https://twitter.com",
-          "country": "United States",
-          "device": "iphone",
-          "os": "ios",
-          "browser": "safari",
-          "timestamp": "2023-06-02T15:30:00.000Z"
-        }
-      ]
+      "createdAt": "2023-06-01T12:00:00.000Z"
     }
-  ],
-  "previousPeriodInteractionCount": 28
+  ]
 }
 ```
 
@@ -766,3 +750,193 @@ Returns the default tier (0) if user is not found or has no subscription:
   }
 }
 ```
+
+# Analytics Endpoints
+
+## GET `/analytics`
+- **Description**: Returns aggregated analytics data for a project with server-side processing
+- **Auth**: JWT
+- **Features**: Server-side aggregation, timezone support, filtering, configurable top-N results
+
+**Query Parameters:**
+```
+Required:
+  projectId: string           // Project UUID
+  startDate: string          // ISO 8601 date (UTC)
+  endDate: string            // ISO 8601 date (UTC)
+
+Optional:
+  timezone: string           // IANA timezone (e.g., "America/Chicago", defaults to "UTC")
+  topN: number              // Number of results per aggregation (default: 10, max: 100)
+
+Filters (all optional):
+  linkId: string            // Filter by specific link
+  destination: string       // Filter by destination URL
+  linkType: string          // Filter by "web" or "deep"
+  country: string           // Filter by country code
+  city: string              // Filter by city name
+  device: string            // Filter by device type
+  os: string                // Filter by operating system
+  browser: string           // Filter by browser
+  referer: string           // Filter by referrer URL
+  utmSource: string         // Filter by UTM source
+  utmMedium: string         // Filter by UTM medium
+  utmCampaign: string       // Filter by UTM campaign
+```
+
+**Example Request:**
+```
+GET /analytics?projectId=fa3990d1-8b2d-496d-811d-9d05fb5b4285&startDate=2025-12-04T00:00:00Z&endDate=2025-12-05T23:59:59Z&timezone=America/Chicago&topN=10&country=US
+```
+
+**Success Response (200):**
+```json
+{
+  "query": {
+    "projectId": "fa3990d1-8b2d-496d-811d-9d05fb5b4285",
+    "startDate": "2025-12-04T00:00:00.000Z",
+    "endDate": "2025-12-05T23:59:59.999Z",
+    "executedAt": "2025-12-05T23:35:00.000Z",
+    "appliedFilters": {
+      "country": "US"
+    }
+  },
+  "summary": {
+    "totalInteractions": 500,
+    "uniqueVisitors": 342,
+    "timeRange": "2 days"
+  },
+  "timeSeries": {
+    "granularity": "hour",        // "hour" for ranges < 2 days, "day" for >= 2 days
+    "data": [
+      {
+        "timestamp": "2025-12-04T17:00:00.000Z",
+        "count": 25,
+        "label": "05:00pm"         // Formatted in requested timezone
+      },
+      {
+        "timestamp": "2025-12-04T18:00:00.000Z",
+        "count": 30,
+        "label": "06:00pm"
+      }
+      // ... all hours in range, including empty hours with count: 0
+    ]
+  },
+  "aggregations": {
+    "topLinks": [
+      {
+        "value": "abc123",                    // Link short code
+        "linkTitle": "Product Launch",
+        "linkUrl": "https://example.com/launch",
+        "count": 150,
+        "percentage": 30.0
+      }
+    ],
+    "topDestinations": [
+      {
+        "value": "example.com/launch",        // Domain and path
+        "count": 150,
+        "percentage": 30.0
+      }
+    ],
+    "topCountries": [
+      {
+        "value": "United States",
+        "count": 500,
+        "percentage": 100.0
+      }
+    ],
+    "topCities": [
+      {
+        "value": "New York",
+        "count": 200,
+        "percentage": 40.0
+      }
+    ],
+    "topDevices": [
+      {
+        "value": "iphone",
+        "count": 300,
+        "percentage": 60.0
+      }
+    ],
+    "topOS": [
+      {
+        "value": "iOS",
+        "count": 250,
+        "percentage": 50.0
+      }
+    ],
+    "topBrowsers": [
+      {
+        "value": "Safari",
+        "count": 250,
+        "percentage": 50.0
+      }
+    ],
+    "topReferrers": [
+      {
+        "value": "google.com",
+        "count": 200,
+        "percentage": 40.0
+      }
+    ],
+    "linkTypes": [
+      {
+        "value": "Web Links",
+        "count": 400,
+        "percentage": 80.0
+      },
+      {
+        "value": "Deep Links",
+        "count": 100,
+        "percentage": 20.0
+      }
+    ],
+    "topUtmSources": [
+      {
+        "value": "google",
+        "count": 150,
+        "percentage": 30.0
+      }
+    ],
+    "topUtmMediums": [
+      {
+        "value": "cpc",
+        "count": 150,
+        "percentage": 30.0
+      }
+    ],
+    "topUtmCampaigns": [
+      {
+        "value": "winter_sale",
+        "count": 150,
+        "percentage": 30.0
+      }
+    ]
+  }
+}
+```
+
+**Error Response (400):**
+```json
+{
+  "statusCode": 400,
+  "message": "Missing required parameters: projectId, startDate, endDate"
+}
+```
+
+**Error Response (401):**
+```json
+{
+  "statusCode": 401,
+  "message": "Unauthorized - Project not found or access denied"
+}
+```
+
+**Notes:**
+- All timestamps are stored in UTC but converted to the requested timezone for grouping
+- Time series includes ALL periods in the range, even those with 0 interactions
+- Empty string values are excluded from aggregations
+- Percentages are calculated against total interactions in the filtered dataset
+- Time series granularity is automatically determined: hourly for < 2 days, daily for >= 2 days
